@@ -1,0 +1,1 @@
+﻿public abstract class StateMachine<T> where T : BaseState { }

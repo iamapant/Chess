@@ -1,5 +1,4 @@
 ﻿using System;
-using Blackboard;
 
 [Serializable]
 public class BlackboardEntry<T> {
