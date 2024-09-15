@@ -15,13 +15,9 @@ public abstract class Entity : MonoBehaviour, IVisitable {
 
     private void Start() {
         var square = GetComponentInParent<Square>();
-        if (square) Initialize(square);
-        else throw new Exception("Entity cannot initialize because it doesn't belong to a square");
     }
 
-    public List<Modifier> Modifiers {
-        get { return GetComponents<Modifier>().ToList(); }
-    }
+    public List<Modifier> Modifiers=> GetComponents<Modifier>().ToList(); 
 
     public void AddModifier<T>(T modifier) where T : Modifier {
         if (gameObject.TryGetComponent(typeof(Modifier), out var mod))
@@ -48,23 +44,25 @@ public abstract class Entity : MonoBehaviour, IVisitable {
         var payload = visitor as EntityPayload;
         payload?.Content(this);
     }
-
-    public virtual void Initialize(Square square) {
+    
+    public void MoveSquare(Square square) {
+        if (!MovePrecondition(square)) return;
+        
+        this.Square?.Mediator.Deregister(this);
         this.Square = square;
-
+        
         square.Mediator.Register(this);
+    
+        OnMove(square);
     }
 
-    // public void MoveSquare(Square square) {
-    //     this.square.Deregister(this);
-    //     this.square = square;
-    //     
-    //     square.Register(this);
-    //
-    //     OnMove(square);
-    // }
-    //
-    // public abstract void OnMove(Square square);
+    protected virtual bool MovePrecondition(Square newSquare) {
+        if (newSquare == null) return false;
+
+        return true;
+    }
+
+    public abstract void OnMove(Square square);
 
     void OnDestroy() => Square.Mediator.Deregister(this);
 

@@ -1,75 +1,221 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class ChessBoard : MonoBehaviour {
-    public ChessBoard() { }
+    private ChessBoard() { }
 
-    public Dictionary<Vector2Int, Square> BoardSquares { get; } = new();
+    private void Start() {
+        grid = GetComponent<Grid>();
+    }
 
-    internal Blackboard SquareTemplates { get; } = new();
+    private void OnMouseDown() { }
 
+    private Grid grid;
 
-    public class Builder : IInitializationBoard, IPopulationBoard, IFinalBoard {
+    private Dictionary<Vector2Int, Square> boardSquares { get; } = new();
+    public ReadOnlyDictionary<Vector2Int, Square> BoardSquares => new(boardSquares);
+
+    public Vector2Int Size { get; set; } = new Vector2Int(8, 8);
+
+    public void AddSquare(Square square, Vector2Int position) {
+        if (boardSquares.ContainsKey(position)) RemoveSquare(position);
+
+        var instantiate = Instantiate(square, transform, true);
+
+        instantiate.name = position.ToString();
+        instantiate.transform.localPosition = grid.CellToLocal(position.ToVector3Int());
+        boardSquares.Add(position, instantiate);
+    }
+
+    public void RemoveSquare(Vector2Int position) {
+        if (!boardSquares.TryGetValue(position, out var square)) return;
+
+        boardSquares.Remove(position);
+        Destroy(square.gameObject);
+    }
+
+    /// <summary>
+    /// Builder for the chessboard
+    /// </summary>
+    public class Builder : IInitializationBoardBuilder, IPopulationBoardBuilder, IFinalBoardBuiler,
+        IInitializationBoardBuilderAddTemplate {
         private ChessBoard board;
+        Vector2Int boardSize = new(8, 8);
+        string tag = "ChessBoard";
+        private Grid grid;
+
+        #region Utilities
+
+        private void RemoveDuplicate() {
+            var boards = GameObject.FindGameObjectsWithTag(tag);
+            foreach (var chessBoard in boards) {
+                if (chessBoard.gameObject != boardObject) Destroy(chessBoard.gameObject);
+            }
+        }
+
+        #endregion
 
         #region Initialization
 
-        public IInitializationBoard AddPrefab(GameObject prefab) {
-            if (prefab.TryGetComponent<ChessBoard>(out ChessBoard board)) {
-                var objs = GameObject.FindObjectsOfType<ChessBoard>();
-                if (objs.Length == 0) objs.ForEach(Destroy);
-                Instantiate(prefab);
-                this.board = board;
+        public Blackboard squareTemplates { get; } = new();
+        private Dictionary<Vector2Int, BlackboardKey> templatePosition = new();
+        private BlackboardKey currentTemplateKey;
+
+        private GameObject boardObject;
+
+        void RetrieveDataFromPrefab(GameObject prefab) {
+            if (!prefab.TryGetComponent<ChessBoard>(out ChessBoard prefabBoard)) {
+                prefabBoard = prefab.GetComponentInChildren<ChessBoard>();
+                if (prefabBoard == null)
+                    throw new ArgumentException("Prefab is missing a ChessBoard component");
+            }
+
+            this.board = prefabBoard;
+            boardSize = prefabBoard.Size;
+            grid = prefab.GetComponent<Grid>();
+        }
+
+        public IInitializationBoardBuilder WithPrefab(GameObject prefab) {
+            if (prefab.GetComponent<ChessBoard>() == null && prefab.GetComponentInChildren<ChessBoard>() == null) {
+                throw new ArgumentException("Prefab is missing a ChessBoard component");
+            }
+
+            boardObject = Instantiate(prefab) as GameObject;
+            board = boardObject.GetComponent<ChessBoard>();
+
+            RetrieveDataFromPrefab(prefab);
+            RemoveDuplicate();
+            return this;
+        }
+
+        public IInitializationBoardBuilder WithSize(int width, int height) {
+            boardSize = new Vector2Int(width, height);
+
+            return this;
+        }
+
+        public IInitializationBoardBuilder AddTemplate(SquareRule rule) {
+            if (rule == null) throw new ArgumentNullException("rule");
+
+            rule.BoardSize = boardSize;
+            AddTemplate(rule.RuleName, rule.Square).WithPositions(rule);
+            return this;
+        }
+
+        public IInitializationBoardBuilderAddTemplate AddTemplate(string templateName, Square square) {
+            var key = squareTemplates.GetOrRegister(templateName);
+            if (squareTemplates.TryGetValue(key, out Square value))
+                Debug.LogWarning($"Overriding template {templateName} with square {value.name}");
+
+            squareTemplates.SetValue(key, square);
+            currentTemplateKey = key;
+
+            return this;
+        }
+
+        public IInitializationBoardBuilder WithPositions([System.Diagnostics.CodeAnalysis.NotNull] params Vector2Int[] positions) {
+            if (positions == null || positions.Length == 0) throw new ArgumentNullException(nameof(positions));
+            foreach (var position in positions) {
+                if (templatePosition.TryGetValue(position, out BlackboardKey key) && key != currentTemplateKey) {
+                    Debug.LogWarning(
+                        $"Overriding template {key.ToString()} with {currentTemplateKey.ToString()} at {position}");
+                }
+
+                if (!squareTemplates.TryGetValue(key, out Square square))
+                    throw new NullReferenceException($"Template not found {key.ToString()}.");
+                templatePosition[position] = currentTemplateKey;
             }
 
             return this;
         }
 
-        public IPopulationBoard InitializeBoard() {
-            if (this.board == null) {
-                BoardInitializeDefault();
-            }
+        private void InitializeDefaults() {
+            boardObject = new GameObject("ChessBoard");
+            board = boardObject.AddComponent<ChessBoard>();
+            boardObject.AddComponent<Grid>();
+        }
+
+        public IPopulationBoardBuilder InitializeBoard() {
+            if (this.board == null) InitializeDefaults();
+
+            //Code to set up the new board here
+            CleanupBoard();
+            SetBoardSize();
+            GenerateNewBoard();
 
             SetTag();
-
+            RemoveDuplicate();
             return this;
         }
 
-        private void BoardInitializeDefault() { 
-            var go = new GameObject();
-            go.AddComponent<ChessBoard>();
-            
-            //Add scripts to create a default board here
-            
-            board = go.GetComponent<ChessBoard>();
+        private void GenerateNewBoard() {
+            foreach (var position in templatePosition.Keys) {
+                if (squareTemplates.TryGetValue(templatePosition[position], out Square square))
+                    board.AddSquare(square, position);
+            }
         }
 
-        private void SetTag() => board.tag = "ChessBoard";
+        private void CleanupBoard() =>
+            board.gameObject.GetComponentsInChildren<Square>(true).ForEach(e => Destroy(e.gameObject));
+
+        private void SetBoardSize() => board.Size = boardSize;
+
+        private void SetTag() => board.tag = tag;
 
         #endregion
 
         #region Population
 
-        public IFinalBoard PopulateBoard() { throw new System.NotImplementedException(); }
+        public IPopulationBoardBuilder AddEntity(Entity entity, params Vector2Int[] positions) {
+            foreach (var position in positions) {
+                if (!board.BoardSquares.TryGetValue(position, out Square square)) {
+                    Debug.LogError($"Cannot add entity {entity.name} to {position.ToString()}");
+                    continue;
+                }
+
+                Instantiate(entity);
+                entity.MoveSquare(square);
+            }
+
+            return this;
+        }
+
+        public IFinalBoardBuiler PopulateBoard() {
+            return this;
+        }
 
         #endregion
 
         #region Finalization
 
-        public ChessBoard Build() => board;
+        public ChessBoard Build() {
+            if (this.board == null) throw new NullReferenceException("Board is not initialized!");
+            RemoveDuplicate();
+
+            return board;
+        }
 
         #endregion
     }
 }
 
-public interface IInitializationBoard {
-    IPopulationBoard InitializeBoard();
+public interface IInitializationBoardBuilder {
+    IPopulationBoardBuilder InitializeBoard();
 }
 
-public interface IPopulationBoard {
-    IFinalBoard PopulateBoard();
+public interface IPopulationBoardBuilder {
+    IFinalBoardBuiler PopulateBoard();
 }
 
-public interface IFinalBoard {
+public interface IFinalBoardBuiler {
     ChessBoard Build();
+}
+
+public interface IInitializationBoardBuilderAddTemplate {
+    Blackboard squareTemplates { get; }
+    IInitializationBoardBuilder WithPositions(params Vector2Int[] positions);
 }

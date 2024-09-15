@@ -32,7 +32,7 @@ public class TurnManager {
 
     public void RevertTurn() {
         throw new NotImplementedException();
-        //Use reflection to play the captured snapshot of the last turn
+        //Use memento to play the captured snapshot of the last turn
         //The list should capture the snapshot of the whole game at the start of each turn
     }
 
