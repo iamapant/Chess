@@ -9,6 +9,16 @@ using UnityEngine;
 public abstract class Entity : MonoBehaviour, IVisitable {
     protected Square Square;
 
+    protected EntityMovementManager Movement;
+
+    void Update() {
+        Movement?.FixedUpdate(this);
+    }
+
+    public void SetMovement(EntityMovementManager movement) {
+        Movement = movement;
+    }
+
     private void OnEnable() { GameController.Instance.TurnManager.UpdateTurn += OnUpdateTurn; }
 
     private void OnDisable() { GameController.Instance.TurnManager.UpdateTurn -= OnUpdateTurn; }

@@ -41,8 +41,9 @@ public class ChessBoard : MonoBehaviour {
     /// <summary>
     /// Builder for the chessboard
     /// </summary>
-    public class Builder : IInitializationBoardBuilder, IPopulationBoardBuilder, IFinalBoardBuiler,
-        IInitializationBoardBuilderAddTemplate {
+    public class Builder : InitializationBoardBuilderAddTemplate, IInitializationBoardBuilder, IPopulationBoardBuilder, 
+        IFinalBoardBuiler
+         {
         private ChessBoard board;
         Vector2Int boardSize = new(8, 8);
         string tag = "ChessBoard";
@@ -98,7 +99,7 @@ public class ChessBoard : MonoBehaviour {
             return this;
         }
 
-        public IInitializationBoardBuilder AddTemplate(SquareRule rule) {
+        public IInitializationBoardBuilder AddRule(SquareRule rule) {
             if (rule == null) throw new ArgumentNullException("rule");
 
             rule.BoardSize = boardSize;
@@ -106,7 +107,7 @@ public class ChessBoard : MonoBehaviour {
             return this;
         }
 
-        public IInitializationBoardBuilderAddTemplate AddTemplate(string templateName, Square square) {
+        public InitializationBoardBuilderAddTemplate AddTemplate(string templateName, Square square) {
             var key = squareTemplates.GetOrRegister(templateName);
             if (squareTemplates.TryGetValue(key, out Square value))
                 Debug.LogWarning($"Overriding template {templateName} with square {value.name}");
@@ -117,7 +118,7 @@ public class ChessBoard : MonoBehaviour {
             return this;
         }
 
-        public IInitializationBoardBuilder WithPositions([System.Diagnostics.CodeAnalysis.NotNull] params Vector2Int[] positions) {
+        public override IInitializationBoardBuilder WithPositions([System.Diagnostics.CodeAnalysis.NotNull] params Vector2Int[] positions) {
             if (positions == null || positions.Length == 0) throw new ArgumentNullException(nameof(positions));
             foreach (var position in positions) {
                 if (templatePosition.TryGetValue(position, out BlackboardKey key) && key != currentTemplateKey) {
@@ -154,8 +155,11 @@ public class ChessBoard : MonoBehaviour {
 
         private void GenerateNewBoard() {
             foreach (var position in templatePosition.Keys) {
-                if (squareTemplates.TryGetValue(templatePosition[position], out Square square))
-                    board.AddSquare(square, position);
+                if (squareTemplates.TryGetValue(templatePosition[position], out Square square)) {
+                    var instance = Instantiate(square, grid?.CellToWorld(position.ToVector3Int()) ?? Vector3.zero, Quaternion.identity);
+                    board.AddSquare(instance, position);
+                    instance.Initialize(board);
+                }
             }
         }
 
@@ -215,7 +219,7 @@ public interface IFinalBoardBuiler {
     ChessBoard Build();
 }
 
-public interface IInitializationBoardBuilderAddTemplate {
+public abstract class InitializationBoardBuilderAddTemplate {
     Blackboard squareTemplates { get; }
-    IInitializationBoardBuilder WithPositions(params Vector2Int[] positions);
+    public abstract IInitializationBoardBuilder WithPositions(params Vector2Int[] positions);
 }

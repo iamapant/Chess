@@ -8,8 +8,6 @@ public class TurnManager {
     public int TurnNumber { get; private set; } = 0;
     public Turn CurrentTurn { get; private set; }
 
-    private bool _isPlaying = false;
-
     public Action<Turn> UpdateTurn;
 
     private List<Turn> _turns;
@@ -17,18 +15,36 @@ public class TurnManager {
     public TurnManager(params Turn[] turns) { _turns = turns.ToList(); }
 
     public void NextTurn() {
-        _isPlaying = true;
         CurrentTurn?.EndTurn();
-        if (CurrentTurn == _turns.Last()) {
-            TurnNumber++;
-            CurrentTurn = _turns.First();
-        }
-        else CurrentTurn = _turns[_turns.IndexOf(CurrentTurn) + 1];
+        if (CurrentTurn == _turns.First()) ++TurnNumber;
+
+        CurrentTurn = CurrentTurn == _turns.Last() ? _turns.First() : _turns[_turns.IndexOf(CurrentTurn) + 1];
 
         CurrentTurn.StartTurn();
 
         UpdateTurn?.Invoke(CurrentTurn);
     }
+
+    private IEnumerator SkipThisTurn(Turn turn) {
+        if (turn == CurrentTurn) return new WaitWhile(() => turn == CurrentTurn);
+        return new WaitWhile(() => turn != CurrentTurn);
+        NextTurn();
+    }
+
+    /// <summary>
+    /// Register to skip the next turn on the list
+    /// </summary>
+    public void SkipTurn() {
+        SkipTurn(CurrentTurn == _turns.Last() ? _turns.First() : _turns[_turns.IndexOf(CurrentTurn) + 1]);
+    }
+
+    /// <summary>
+    /// Register to skip a faction turn
+    /// </summary>
+    /// <param name="faction">Faction of the skipping turn</param>
+    public void SkipTurn(Faction faction) { SkipTurn(_turns.Find(e => e is FactionTurn ft && ft.Faction == faction)); }
+
+    public void SkipTurn(Turn turn) => GameController.Instance.StartCoroutine(SkipThisTurn(turn));
 
     public void RevertTurn() {
         throw new NotImplementedException();
@@ -36,18 +52,20 @@ public class TurnManager {
         //The list should capture the snapshot of the whole game at the start of each turn
     }
 
+    #region Modify Turn List
+
     public void Add(Turn turn) {
-        if (_isPlaying) {
+        if (TurnNumber != 0) {
             Debug.LogWarning("Cannot modify turn order while game is playing.");
             return;
         }
 
         if (!_turns.Any(e => e.GetType() == turn.GetType())) _turns.Add(turn);
-        else throw new Exception($"Turn {turn.name} is already in the list");
+        else throw new Exception($"Turn {turn.ToString()} is already in the list");
     }
 
     public void Remove(Turn turn) {
-        if (_isPlaying) {
+        if (TurnNumber != 0) {
             Debug.LogWarning("Cannot modify turn order while game is playing.");
             return;
         }
@@ -56,7 +74,7 @@ public class TurnManager {
     }
 
     public void AddFirst(Turn turn) {
-        if (_isPlaying) {
+        if (TurnNumber != 0) {
             Debug.LogWarning("Cannot modify turn order while game is playing.");
             return;
         }
@@ -65,34 +83,36 @@ public class TurnManager {
             if (_turns.Count > 0) _turns.AddBefore(turn, _turns.First());
             else _turns.Add(turn);
         }
-        else throw new Exception($"Turn {turn.name} is already in the Collection");
+        else throw new Exception($"Turn {turn.ToString()} is already in the Collection");
     }
 
     public void AddAfter(Turn turn, Turn after) {
-        if (_isPlaying) {
+        if (TurnNumber != 0) {
             Debug.LogWarning("Cannot modify turn order while game is playing.");
             return;
         }
 
-        if (_turns.All(e => e != after)) throw new Exception($"The Collection does not contain {after.name}");
+        if (_turns.All(e => e != after)) throw new Exception($"The Collection does not contain {after.ToString()}");
         if (_turns.All(e => e.GetType() != turn.GetType())) {
             if (_turns.Count > 0) _turns.AddAfter(turn, after);
             else _turns.Add(turn);
         }
-        else throw new Exception($"Turn {turn.name} is already in the list");
+        else throw new Exception($"Turn {turn.ToString()} is already in the list");
     }
 
     public void AddBefore(Turn turn, Turn before) {
-        if (_isPlaying) {
+        if (TurnNumber != 0) {
             Debug.LogWarning("Cannot modify turn order while game is playing.");
             return;
         }
 
-        if (_turns.All(e => e != before)) throw new Exception($"The Collection does not contain {before.name}");
+        if (_turns.All(e => e != before)) throw new Exception($"The Collection does not contain {before.ToString()}");
         if (_turns.All(e => e.GetType() != turn.GetType())) {
             if (_turns.Count > 0) _turns.AddAfter(turn, before);
             else _turns.Add(turn);
         }
-        else throw new Exception($"Turn {turn.name} is already in the list");
+        else throw new Exception($"Turn {turn.ToString()} is already in the list");
     }
+
+    #endregion
 }
