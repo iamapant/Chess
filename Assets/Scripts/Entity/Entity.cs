@@ -1,33 +1,57 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class Entity : MonoBehaviour, IVisitable {
     protected Square Square;
 
-    protected EntityMovementManager Movement;
+    #region Rendering
+    [Space(20)] [Header("Rendering")] 
+    
+    [SerializeReference, SubclassSelector] RenderSupplier RenderSupplier;
+    #endregion
 
-    void Update() {
-        Movement?.FixedUpdate(this);
-    }
+    #region Move
+    [Header("Move")]
+    
+    [SerializeField] protected float MoveSpeed = 1f;
+    [SerializeReference, SubclassSelector] private MoveSpeedCalculator MoveSpeedCalculator;
+    #endregion
+
+    #region Movement Manager
+    protected EntityMovementManager Movement;
 
     public void SetMovement(EntityMovementManager movement) {
         Movement = movement;
     }
 
-    private void OnEnable() { GameController.Instance.TurnManager.UpdateTurn += OnUpdateTurn; }
+    public void RemoveMovement() => SetMovement(new NoMovement());
 
-    private void OnDisable() { GameController.Instance.TurnManager.UpdateTurn -= OnUpdateTurn; }
+    #endregion
+    
+    void Update() {
+        Movement?.FixedUpdate(this);
+    }
+
+    private void OnEnable() {
+        GameController.Instance.TurnManager.UpdateTurn += OnUpdateTurn;
+    }
+
+    private void OnDisable() {
+        GameController.Instance.TurnManager.UpdateTurn -= OnUpdateTurn;
+    }
+
+    private void Awake() {
+        RenderSupplier.RenderObject = gameObject;
+    }
 
     private void Start() {
         var square = GetComponentInParent<Square>();
+        RenderSupplier.Render();
     }
 
-    public List<Modifier> Modifiers=> GetComponents<Modifier>().ToList(); 
+    public List<Modifier> Modifiers => GetComponents<Modifier>().ToList();
 
     public void AddModifier<T>(T modifier) where T : Modifier {
         if (gameObject.TryGetComponent(typeof(Modifier), out var mod))
@@ -54,15 +78,16 @@ public abstract class Entity : MonoBehaviour, IVisitable {
         var payload = visitor as EntityPayload;
         payload?.Content(this);
     }
-    
+
     public void MoveSquare(Square square) {
         if (!MovePrecondition(square)) return;
-        
+
         this.Square?.Mediator.Deregister(this);
         this.Square = square;
-        
+
         square.Mediator.Register(this);
-    
+        Movement = new StayInSquare(square, MoveSpeed, new LerpSpeedCalculator());
+
         OnMove(square);
     }
 

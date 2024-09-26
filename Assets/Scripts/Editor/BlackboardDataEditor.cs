@@ -88,3 +88,6 @@ public class BlackboardDataEditor : Editor {
         serializedObject.ApplyModifiedProperties();
     }
 }
+
+[CustomEditor(typeof(SquareStats))]
+public class SquareStatsEditor : BlackboardDataEditor { }

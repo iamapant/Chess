@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -34,7 +33,7 @@ public class Observer<T> {
         if (onValueChanged == null) onValueChanged = new UnityEvent<T>();
 
         #if UNITY_EDITOR
-        UnityEventTools.AddPersistentListener(onValueChanged, callback);
+        UnityEditor.Events.UnityEventTools.AddPersistentListener(onValueChanged, callback);
         #else
         onValueChanged.AddListener(callback);
         #endif
@@ -45,7 +44,7 @@ public class Observer<T> {
         if (onValueChanged == null) return;
 
         #if UNITY_EDITOR
-        UnityEventTools.RemovePersistentListener(onValueChanged, callback);
+        UnityEditor.Events.UnityEventTools.RemovePersistentListener(onValueChanged, callback);
         #else
         onValueChanged.RemoveListener(callback);
         #endif

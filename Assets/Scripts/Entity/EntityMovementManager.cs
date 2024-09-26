@@ -25,5 +25,9 @@ public class StayInSquare : EntityMoving {
     public StayInSquare(Square square, float movementSpeed, MoveSpeedCalculator moveSpeedCalculator) : base(movementSpeed, moveSpeedCalculator) { this.square = square; }
 
     public override void FixedUpdate(Entity entity) {
+        if (entity.transform.position != square.transform.position) {
+            entity.transform.position
+                += SpeedCalculator.CalculateSpeed(entity.transform.position, square.transform.position, MovementSpeed);
+        }
     }
 }

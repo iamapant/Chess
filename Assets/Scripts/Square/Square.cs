@@ -4,11 +4,10 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 public abstract class Square : MonoBehaviour, IVisitable {
-    [FormerlySerializedAs("EntityMediator")]
     public EntityMediator Mediator;
 
-    public Sprite Sprite;
-    protected SpriteRenderer SpriteRenderer;
+    [Header("Rendering")]
+    [SerializeReference, SubclassSelector] RenderSupplier RenderSupplier; 
 
     public Vector2Int position {
         get {
@@ -28,8 +27,10 @@ public abstract class Square : MonoBehaviour, IVisitable {
 
     public virtual void Initialize(ChessBoard chessBoard) {
         this.chessBoard = chessBoard;
-        SpriteRenderer = GetComponent<SpriteRenderer>();
-        if (SpriteRenderer) SpriteRenderer.sprite = Sprite;
+    }
+
+    private void Awake() {
+        RenderSupplier.RenderObject = gameObject;
     }
 
     private void Start() {
@@ -39,6 +40,7 @@ public abstract class Square : MonoBehaviour, IVisitable {
         }
 
         Mediator = mediator;
+        RenderSupplier.Render();
     }
 
     private void OnEnable() {

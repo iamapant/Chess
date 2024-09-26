@@ -1,6 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 
+
 public class EntityMediator : Mediator<Entity> {
     [CanBeNull] private Square square;
 

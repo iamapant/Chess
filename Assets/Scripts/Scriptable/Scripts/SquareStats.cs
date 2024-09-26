@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using Scriptable.Scripts;
-using UnityEditor;
+﻿using Scriptable.Scripts;
 using UnityEngine;
 
 
@@ -24,6 +21,3 @@ public class SquareStats : BlackboardDataWithDefault {
     
     
 }
-
-[CustomEditor(typeof(SquareStats))]
-public class SquareStatsEditor : BlackboardDataEditor { }
