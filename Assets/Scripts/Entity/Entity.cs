@@ -90,6 +90,8 @@ public abstract class Entity : MonoBehaviour, IVisitable {
 
         OnMove(square);
     }
+    
+    public Square GetSquare() => Square;
 
     protected virtual bool MovePrecondition(Square newSquare) {
         if (newSquare == null) return false;

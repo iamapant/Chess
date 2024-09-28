@@ -14,6 +14,11 @@ public abstract class RenderSupplier {
 }
 
 [Serializable]
+public class NoRender : RenderSupplier {
+    public override void Render() { }
+}
+
+[Serializable]
 public class RenderSupplier2D : RenderSupplier {
     public Sprite Sprite;
 

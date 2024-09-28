@@ -14,7 +14,7 @@ public abstract class Modifier : MonoBehaviour {
         this.Entity = entity;
         IsInitialized = true;
         InitializedTurn = GameController.Instance.TurnManager.CurrentTurn;
-        InitializedTurnNumber = InitializedTurn.TurnNumber;
+        InitializedTurnNumber = GameController.Instance.TurnManager.TurnNumber;
 
         OnInitialize();
     }

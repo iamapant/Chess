@@ -5,12 +5,17 @@ using UnityEditor;
 using UnityEngine;
 
 public class GameController : PersistentSingleton<GameController> {
-    [SerializeField] private List<Turn> turns;
-    public TurnManager TurnManager { get; private set; }
-    public ChessBoard ChessBoard { get; private set; }
+    [Header("Chessboard configuration")]
     [SerializeField] GameObject chessboardPrefab;
+    public ChessBoard ChessBoard { get; private set; }
+    [SerializeReference, SubclassSelector] private List<SquareRule> rules;
     
-    private void Awake() {
+    [Space(20)]
+    [Header("Turn configuration")]
+    [SerializeReference, SubclassSelector] private List<Turn> turns;
+    public TurnManager TurnManager { get; private set; }
+
+    protected override void Awake() {
         TurnManager = new TurnManager(turns.ToArray());
         ChessBoard = BuildChessBoard();
     }

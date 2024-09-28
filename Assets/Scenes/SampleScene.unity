@@ -214,8 +214,86 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1201759349
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1201759350}
+  - component: {fileID: 1201759351}
+  m_Layer: 0
+  m_Name: Game Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1201759350
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201759349}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1201759351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201759349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d2940d88f421e142bb25b846aa5dbdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AutoUnparentOnLoad: 1
+  chessboardPrefab: {fileID: 0}
+  rules:
+  - rid: 1896660379933605893
+  - rid: 1896660379933605894
+  turns:
+  - rid: 1896660379933605895
+  references:
+    version: 2
+    RefIds:
+    - rid: 1896660379933605893
+      type: {class: CastleRule, ns: , asm: Assembly-CSharp}
+      data:
+        ruleName: 
+        Square: {fileID: 0}
+        height: 1
+        position: 0
+        isWidthLimited: 0
+        widthLimit: 10
+    - rid: 1896660379933605894
+      type: {class: WallRule, ns: , asm: Assembly-CSharp}
+      data:
+        ruleName: 
+        Square: {fileID: 0}
+        origin: {x: 0, y: 0}
+        horizontalWall: 0
+        verticalWall: 0
+    - rid: 1896660379933605895
+      type: {class: FactionTurn, ns: , asm: Assembly-CSharp}
+      data:
+        Faction:
+          FactionName: 
+        _currentTurn: {x: 0, y: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 519420032}
+  - {fileID: 1201759350}

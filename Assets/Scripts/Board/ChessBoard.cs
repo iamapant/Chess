@@ -38,6 +38,19 @@ public class ChessBoard : MonoBehaviour {
         Destroy(square.gameObject);
     }
 
+    public bool TryGetSquareLocation(Square square, out Vector2Int location) {
+        foreach (var keyPair in boardSquares) {
+            if (keyPair.Value == square) {
+                location = keyPair.Key;
+                return true;
+            }
+        }
+        
+        
+        location = default;
+        return false;
+    }
+
     /// <summary>
     /// Builder for the chessboard
     /// </summary>
