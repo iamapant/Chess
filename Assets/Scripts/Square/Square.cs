@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 public abstract class Square : MonoBehaviour, IVisitable {
-    public EntityMediator Mediator;
+    [HideInInspector]public EntityMediator Mediator;
 
     [Header("Rendering")]
     [SerializeReference, SubclassSelector] RenderSupplier RenderSupplier; 
@@ -31,29 +31,25 @@ public abstract class Square : MonoBehaviour, IVisitable {
 
     private void Awake() {
         RenderSupplier.RenderObject = gameObject;
+        Mediator = gameObject.AddComponent<EntityMediator>();
     }
 
     private void Start() {
-        var mediator = gameObject.GetComponent<EntityMediator>();
-        if (!mediator) {
-            mediator = gameObject.AddComponent<EntityMediator>();
-        }
-
-        Mediator = mediator;
         RenderSupplier.Render();
     }
 
     private void OnEnable() {
-        GameController.Instance.TurnManager.UpdateTurn += OnUpdateTurn;
+        if (GameController.Instance.TurnManager != null) GameController.Instance.TurnManager.UpdateTurn += OnUpdateTurn;
     }
 
     private void OnDisable() {
-        GameController.Instance.TurnManager.UpdateTurn -= OnUpdateTurn;
-    }
-
-    public void Accept(IVisitor visitor) {
-        if (visitor is EntityPayload payload) payload.Content(this);
+        if (GameController.Instance.TurnManager != null) GameController.Instance.TurnManager.UpdateTurn -= OnUpdateTurn;
     }
 
     protected virtual void OnUpdateTurn(Turn turn) { }
+
+    public void Accept(IVisitor visitor) {
+        var payload = visitor as EntityPayload;
+        payload?.Content(this);
+    }
 }

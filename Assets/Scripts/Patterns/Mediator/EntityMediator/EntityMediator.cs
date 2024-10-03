@@ -3,9 +3,9 @@ using JetBrains.Annotations;
 
 
 public class EntityMediator : Mediator<Entity> {
-    [CanBeNull] private Square square;
+    Square _square;
 
-    private void Start() { square = GetComponent<Square>(); }
+    private void Awake() { _square = gameObject.GetComponent<Square>(); }
 
     protected override void OnRegistered(Entity entity) {
         var dict = entity.OnRegistered();
@@ -40,7 +40,7 @@ public class EntityMediator : Mediator<Entity> {
     protected internal override void Broadcast(Entity source, IVisitor message, Func<Entity, bool> predicate = null) {
         base.Broadcast(source, message, predicate);
 
-        square?.Accept(message);
+        _square?.Accept(message);
     }
 
     protected override bool MediatorConditionMet(Entity component) => true;

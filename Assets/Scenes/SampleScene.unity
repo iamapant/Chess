@@ -214,6 +214,124 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &580318166
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 580318167}
+  - component: {fileID: 580318168}
+  m_Layer: 0
+  m_Name: EntityPrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &580318167
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580318166}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &580318168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580318166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0225b7027e4377ac89b7a28e9d2102, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RenderSupplier:
+    rid: 3941251147130994690
+  MoveSpeed: 1
+  MoveSpeedCalculator:
+    rid: 3941251147130994691
+  references:
+    version: 2
+    RefIds:
+    - rid: 3941251147130994690
+      type: {class: RenderSupplier2D, ns: , asm: Assembly-CSharp}
+      data:
+        RenderObject: {fileID: 0}
+        Sprite: {fileID: 1516312158, guid: cebb004b82622af47935a634f3513d76, type: 3}
+    - rid: 3941251147130994691
+      type: {class: ConstantSpeedCalculator, ns: , asm: Assembly-CSharp}
+      data:
+        Speed: 1
+--- !u!1 &1045637582
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1045637583}
+  - component: {fileID: 1045637584}
+  m_Layer: 0
+  m_Name: SquarePrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1045637583
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1045637582}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1045637584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1045637582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0833dd23d2d47c48ff84c037197da0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Mediator: {fileID: 838520802300145276, guid: 502772115686a564d88299e40543674c, type: 3}
+  RenderSupplier:
+    rid: 3941251147130994688
+  faction:
+    FactionName: this
+  references:
+    version: 2
+    RefIds:
+    - rid: 3941251147130994688
+      type: {class: RenderSupplier2D, ns: , asm: Assembly-CSharp}
+      data:
+        RenderObject: {fileID: 0}
+        Sprite: {fileID: 112089476, guid: 7dd074fd20cf7df4badd0fde4132343e, type: 3}
 --- !u!1 &1201759349
 GameObject:
   m_ObjectHideFlags: 0
@@ -259,41 +377,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AutoUnparentOnLoad: 1
+  boardSize: {x: 0, y: 0}
   chessboardPrefab: {fileID: 0}
-  rules:
-  - rid: 1896660379933605893
-  - rid: 1896660379933605894
+  defaultSquarePrefab: {fileID: 0}
+  rules: []
+  templates:
+    _serializedList: []
+  entities:
+    _serializedList: []
   turns:
-  - rid: 1896660379933605895
+  - rid: 3941251147130994689
   references:
     version: 2
     RefIds:
-    - rid: 1896660379933605893
-      type: {class: CastleRule, ns: , asm: Assembly-CSharp}
-      data:
-        ruleName: 
-        Square: {fileID: 0}
-        height: 1
-        position: 0
-        isWidthLimited: 0
-        widthLimit: 10
-    - rid: 1896660379933605894
-      type: {class: WallRule, ns: , asm: Assembly-CSharp}
-      data:
-        ruleName: 
-        Square: {fileID: 0}
-        origin: {x: 0, y: 0}
-        horizontalWall: 0
-        verticalWall: 0
-    - rid: 1896660379933605895
+    - rid: 3941251147130994689
       type: {class: FactionTurn, ns: , asm: Assembly-CSharp}
       data:
         Faction:
-          FactionName: 
-        _currentTurn: {x: 0, y: 0}
+          FactionName: this
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 519420032}
   - {fileID: 1201759350}
+  - {fileID: 1045637583}
+  - {fileID: 580318167}

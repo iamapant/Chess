@@ -9,7 +9,7 @@ public abstract class EntityMovementManager {
     public static bool Peek(Entity entity, Square square) {
         if (!IsSquareAllowEntry(entity, square)) return false;
 
-        if (square?.Entities?.Any(e => IsEntityAllowEntry(entity, e) == false) ?? false) return false;
+        if (square?.Entities?.All(e => IsEntityAllowEntry(entity, e)) ?? false) return false;
 
         return true;
     }

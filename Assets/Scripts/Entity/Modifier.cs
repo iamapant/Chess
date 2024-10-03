@@ -4,7 +4,10 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class Modifier : MonoBehaviour {
-    public Func<Entity, bool> Condition = null;
+    public virtual Func<Entity, bool> Condition {
+        get => entity => entity != Entity;
+    }
+
     protected Entity Entity;
     protected bool IsInitialized = false;
     protected int InitializedTurnNumber;
@@ -19,44 +22,38 @@ public abstract class Modifier : MonoBehaviour {
         OnInitialize();
     }
 
-    private void OnEnable() { GameController.Instance.TurnManager.UpdateTurn += OnUpdateTurn; }
+    private void OnEnable() {
+        if (GameController.Instance?.TurnManager != null)
+            GameController.Instance.TurnManager.UpdateTurn += OnUpdateTurn;
+    }
 
-    private void OnDisable() { GameController.Instance.TurnManager.UpdateTurn -= OnUpdateTurn; }
+    private void OnDisable() {
+        if (GameController.Instance?.TurnManager != null)
+            GameController.Instance.TurnManager.UpdateTurn -= OnUpdateTurn;
+    }
 
     protected virtual void OnUpdateTurn(Turn turn) { }
 
     protected abstract void OnInitialize();
     protected abstract void OnDestroy();
 
-    public void OnRegistered<T>(T visitable) where T : IVisitable {
+    public virtual void Registered(IVisitable visitable) {
+        if (!IsInitialized)
+            throw new Exception("This modifier has not been initialized.");
+        if (visitable is Entity entity) OnRegisteredAsEntity(entity);
+        if (visitable is Square square) OnRegisteredAsSquare(square);
+    }
+
+    public virtual void Deregistered(IVisitable visitable) {
         if (!IsInitialized)
             throw new Exception("This modifier has not been initialized.");
 
-        var entity = visitable as Entity;
-        var square = visitable as Square;
-
-        if (entity != null) { OnRegisteredAsEntity(entity); }
-
-        if (square != null) { OnRegisteredAsSquare(square); }
+        if (visitable is Entity entity && entity != null) OnDeregisteredAsEntity(entity);
+        if (visitable is Square square && square != null) OnDeregisteredAsSquare(square);
     }
 
-    public void OnDeregistered<T>(T visitable) where T : IVisitable {
-        if (!IsInitialized)
-            throw new Exception("This modifier has not been initialized.");
-
-        var entity = visitable as Entity;
-        var square = visitable as Square;
-
-        if (entity != null) { OnDeregisteredAsEntity(entity); }
-
-        if (square != null) { OnDeregisteredAsSquare(square); }
-    }
-
-    protected virtual void OnDeregisteredAsSquare(Square square) { }
-
-    protected virtual void OnDeregisteredAsEntity(Entity entity) { }
-
-    protected virtual void OnRegisteredAsEntity(Entity entity) { }
-
-    protected virtual void OnRegisteredAsSquare(Square square) { }
+    protected abstract void OnDeregisteredAsEntity(Entity entity);
+    protected abstract void OnDeregisteredAsSquare(Square square);
+    protected abstract void OnRegisteredAsEntity(Entity entity);
+    protected abstract void OnRegisteredAsSquare(Square square);
 }

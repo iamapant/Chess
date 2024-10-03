@@ -3,7 +3,6 @@ using UnityEngine;
 
 [Serializable]
 public abstract class MoveSpeedCalculator {
-    public float Speed;
     public abstract Vector3 CalculateSpeed(Vector3 position, Vector3 destination, float speed = 1);
 }
 

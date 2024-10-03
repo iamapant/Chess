@@ -8,7 +8,7 @@ public class TurnManager {
     public int TurnNumber { get; private set; } = 0;
     public Turn CurrentTurn { get; private set; }
 
-    public Action<Turn> UpdateTurn;
+    public event Action<Turn> UpdateTurn;
 
     private List<Turn> _turns;
 
@@ -26,8 +26,8 @@ public class TurnManager {
     }
 
     private IEnumerator SkipThisTurn(Turn turn) {
-        if (turn == CurrentTurn) return new WaitWhile(() => turn == CurrentTurn);
-        return new WaitWhile(() => turn != CurrentTurn);
+        if (turn == CurrentTurn) yield return new WaitWhile(() => turn == CurrentTurn);
+        yield return new WaitWhile(() => turn != CurrentTurn);
         NextTurn();
     }
 

@@ -78,6 +78,7 @@ public class ChessBoard : MonoBehaviour {
         public Blackboard squareTemplates { get; } = new();
         private Dictionary<Vector2Int, BlackboardKey> templatePosition = new();
         private BlackboardKey currentTemplateKey;
+        private Square defaultSquareTemplate;
 
         private GameObject boardObject;
 
@@ -109,6 +110,12 @@ public class ChessBoard : MonoBehaviour {
         public IInitializationBoardBuilder WithSize(int width, int height) {
             boardSize = new Vector2Int(width, height);
 
+            return this;
+        }
+
+        public IInitializationBoardBuilder WithDefaultSquare(Square square) {
+            defaultSquareTemplate = square;
+            
             return this;
         }
 
@@ -186,7 +193,6 @@ public class ChessBoard : MonoBehaviour {
         #endregion
 
         #region Population
-
         public IPopulationBoardBuilder AddEntity(Entity entity, params Vector2Int[] positions) {
             foreach (var position in positions) {
                 if (!board.BoardSquares.TryGetValue(position, out Square square)) {

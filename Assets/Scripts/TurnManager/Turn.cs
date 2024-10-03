@@ -19,7 +19,6 @@ public abstract class Turn {
 [Serializable]
 public class FactionTurn : Turn {
     [SerializeField] public Faction Faction;
-    [SerializeField] public Vector2Int _currentTurn;
 
     public override void StartTurn() { throw new NotImplementedException(); }
     public override void EndTurn() { throw new NotImplementedException(); }
