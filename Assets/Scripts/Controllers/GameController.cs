@@ -57,6 +57,8 @@ public class GameController : PersistentSingleton<GameController> {
     }
 
     private void Start() {
+        
+        if (!FindObjectOfType<Square>())square = Instantiate(square);
         var pre1 = Instantiate(entity);
         var pre2 = Instantiate(entity);
 
@@ -64,6 +66,7 @@ public class GameController : PersistentSingleton<GameController> {
         pre2.name = "pre2";
         
         pre1.AddModifier<HelloModifier>();
+        square.AddModifier<HelloModifier>();
         
         pre1.MoveSquare(square);
         pre2.MoveSquare(square);

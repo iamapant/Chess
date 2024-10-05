@@ -37,5 +37,5 @@ public abstract class Mediator<T> : MonoBehaviour where T : Component, IVisitabl
 
     protected abstract bool MediatorConditionMet(T component);
 
-    private bool SenderConditionMet(T e, Func<T, bool> predicate) => predicate == null || predicate(e);
+    protected bool SenderConditionMet(T e, Func<T, bool> predicate) => predicate == null || predicate(e);
 }
