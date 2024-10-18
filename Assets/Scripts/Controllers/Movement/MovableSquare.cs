@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AYellowpaper.SerializedCollections;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
-[Serializable]
-public class MovableSquare {
-    public static int AbsoluteContinuousRushLimit = 10;
-    public SerializedDictionary<Vector2Int, bool> MovableDirections = new();
+public static class MovableSquare {
+    public static int ContinuousRushLimit = 10;
 
-    public List<Square> QueryValidSquares(Entity entity) {
+    public static List<Square> QueryValidSquares(Entity entity) {
         List<Square> validSquares = new();
-        if (!GameController.Instance.ChessBoard.TryGetSquareLocation(entity.GetSquare(), out var position))
+        if (!GameController.Instance.ChessBoard.TryGetLocation(entity.GetSquare(), out var position))
             return new List<Square>();
 
-        foreach (var direction in MovableDirections.Keys) {
-            if (MovableDirections[direction]) {
+        foreach (var direction in entity.MovableDirections.Keys) {
+            if (entity.MovableDirections[direction]) {
                 int continueTimes = 1;
-                while (continueTimes <= AbsoluteContinuousRushLimit) {
+                while (continueTimes <= ContinuousRushLimit) {
                     var continuousDirection = direction * continueTimes;
                     var continuousPosition = position + (direction * (continueTimes - 1));
 

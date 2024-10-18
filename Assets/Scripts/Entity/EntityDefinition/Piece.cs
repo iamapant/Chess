@@ -1,6 +1,6 @@
-﻿public class Piece : Entity {
+﻿public abstract class Piece : Entity {
     
-    public override void OnMove(Square square) {
+    protected override void OnMove(Square from, Square to) {
     }
 
     public override bool IsAllowed(Entity entity) { throw new System.NotImplementedException(); }

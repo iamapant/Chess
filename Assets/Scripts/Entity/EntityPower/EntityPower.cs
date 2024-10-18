@@ -1,10 +1,13 @@
 ﻿using System;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "EntityPower", menuName = "EntityPower")]
-public abstract class EntityPower : ScriptableObject {
-    private void OnEnable() {
-        
-        
+public abstract class EntityPower {
+    private Entity _entity;
+    private int _cooldown = 0;
+
+    public EntityPower(Entity entity) {
+        _entity = entity;
     }
+
+    public abstract void OnUpdateTurn(Turn turn);
 }

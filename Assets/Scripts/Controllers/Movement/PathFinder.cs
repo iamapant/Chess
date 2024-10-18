@@ -76,11 +76,17 @@ public static class PathFinder {
                     out var boardSquare))
                 return false;
 
-            if (!EntityMovementManager.Peek(entity, boardSquare)) return false;
+            if (!IsSquareAllowed(entity, boardSquare)) return false;
 
             if (path.Count == 0) return true;
         }
 
         return false;
+    }
+
+    private static bool IsSquareAllowed(Entity entity, Square boardSquare) {
+        
+        
+        return true;
     }
 }

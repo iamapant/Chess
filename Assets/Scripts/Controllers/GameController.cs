@@ -8,6 +8,10 @@ using UnityEditor;
 using UnityEngine;
 
 public class GameController : PersistentSingleton<GameController> {
+    public delegate void onUpdateCallback();
+    public event onUpdateCallback OnUpdateCallback;
+    
+    #region Chessboard Configuration
     [Header("Chessboard Configuration")]
     [SerializeField] private Vector2Int boardSize;
     [SerializeField] GameObject chessboardPrefab;
@@ -22,13 +26,32 @@ public class GameController : PersistentSingleton<GameController> {
     
     [Space(10)]
     [SerializeField] SerializedDictionary<Entity, List<Vector2Int>> entities;
+    #endregion
+
+    #region Square Template
+    [Space(20)]
+    [Header("Square Template")]
+    [SerializeField]SerializedDictionary<string, SquareTemplate> SquareTemplates;
+    public SquareTemplateController SquareTemplateController;
+    #endregion
     
-    
+    #region Turn Configuration
     [Space(20)]
     [Header("Turn configuration")]
     [SerializeReference, SubclassSelector] private List<Turn> turns;
     public TurnManager TurnManager { get; private set; }
+    #endregion
 
+    #region Log
+    public GameActionLogger GameActionLogger { get; private set; }    
+    #endregion
+
+    #region Entity Movement
+    [Space(20)]
+    [Header("Square Template")]
+    public EntityMovementController EntityMovementController;
+    #endregion
+    
     [Space(20)] [Header("Test")] 
     [SerializeField] private Entity entity;
     [SerializeField] private Square square;
@@ -37,6 +60,9 @@ public class GameController : PersistentSingleton<GameController> {
         base.Awake();
         TurnManager = new TurnManager(turns.ToArray());
         ChessBoard = BuildChessBoard();
+        SquareTemplateController = new SquareTemplateController();
+        GameActionLogger = new GameActionLogger();
+        
     }
 
     private ChessBoard BuildChessBoard() {
@@ -56,19 +82,23 @@ public class GameController : PersistentSingleton<GameController> {
         return builder.Build();
     }
 
+    private void Update() {
+        OnUpdateCallback?.Invoke();
+    }
+
     private void Start() {
         
-        if (!FindObjectOfType<Square>())square = Instantiate(square);
-        var pre1 = Instantiate(entity);
-        var pre2 = Instantiate(entity);
-
-        pre1.name = "pre1";
-        pre2.name = "pre2";
-        
-        pre1.AddModifier<HelloModifier>();
-        square.AddModifier<HelloModifier>();
-        
-        pre1.MoveSquare(square);
-        pre2.MoveSquare(square);
+        // if (!FindObjectOfType<Square>())square = Instantiate(square);
+        // var pre1 = Instantiate(entity);
+        // var pre2 = Instantiate(entity);
+        //
+        // pre1.name = "pre1";
+        // pre2.name = "pre2";
+        //
+        // pre1.AddModifier<HelloModifier>();
+        // square.AddModifier<HelloModifier>();
+        //
+        // pre1.MoveSquare(square);
+        // pre2.MoveSquare(square);
     }
 }

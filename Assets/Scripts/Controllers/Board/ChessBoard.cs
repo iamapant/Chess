@@ -38,7 +38,7 @@ public class ChessBoard : MonoBehaviour {
         Destroy(square.gameObject);
     }
 
-    public bool TryGetSquareLocation(Square square, out Vector2Int location) {
+    public bool TryGetLocation(Square square, out Vector2Int location) {
         foreach (var keyPair in boardSquares) {
             if (keyPair.Value == square) {
                 location = keyPair.Key;
@@ -50,6 +50,8 @@ public class ChessBoard : MonoBehaviour {
         location = default;
         return false;
     }
+    
+    public bool TryGetSquare(Vector2Int position, out Square square) => boardSquares.TryGetValue(position, out square);
 
     /// <summary>
     /// Builder for the chessboard
@@ -201,7 +203,7 @@ public class ChessBoard : MonoBehaviour {
                 }
 
                 Instantiate(entity);
-                entity.MoveSquare(square);
+                GameController.Instance.EntityMovementController.MoveToSquare(entity, square);
             }
 
             return this;

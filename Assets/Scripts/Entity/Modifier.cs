@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -12,7 +13,7 @@ public abstract class Modifiable : MonoBehaviour, IVisitable {
             Debug.LogError($"Cannot have more than 1 controlling component attached to {gameObject.name}");
             // if (Application.isPlaying) Destroy(gameObject.GetComponent(this.GetType()));
             // else {
-                UnityEditor.EditorApplication.delayCall += () => {
+                EditorApplication.delayCall += () => {
                     DestroyImmediate(gameObject.GetComponent(this.GetType()));
                 };
             // }
@@ -89,7 +90,7 @@ public abstract class Modifier : MonoBehaviour {
                 : $"Modifier {GetType()} requires Component either of type {nameof(Entity)} or {nameof(Square)} to function.");
             // if (Application.isPlaying) Destroy(gameObject.GetComponent(this.GetType()));
             // else {
-                UnityEditor.EditorApplication.delayCall += () => {
+                EditorApplication.delayCall += () => {
                     DestroyImmediate(gameObject.GetComponent(this.GetType()));
                 };
             // }

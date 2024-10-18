@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
-public class Unit : Entity {
-    [SerializeField] MovableSquare movableSquare;
-    public override void OnMove(Square square) { }
+public abstract class Unit : Entity {
+    protected override void OnMove(Square from, Square to) { }
     public override bool IsAllowed(Entity entity) { throw new System.NotImplementedException(); }
 }
